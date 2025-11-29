@@ -35,10 +35,13 @@ Docker Hub: alopezt24/birthday-api
 brew install minikube podman helm
 
 # Start Minikube
-minikube start --driver=podman --cpus=2 --memory=2048
+minikube start --driver=podman --cpus=2 --memory=4096 \
+  --container-runtime=cri-o \
+  --extra-config=kubelet.allowed-unsafe-sysctls='kernel.msg*,net.ipv4.route.min_pmtu'
 
 # Enable ingress
 minikube addons enable ingress
+minikube addons enable storage-provisioner
 ```
 
 ## Quick Start

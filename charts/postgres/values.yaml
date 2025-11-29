@@ -1,6 +1,6 @@
 # PostgreSQL configuration
 image:
-  repository: postgres
+  repository: docker.io/postgres
   tag: "18.1-alpine"
   pullPolicy: IfNotPresent
 
