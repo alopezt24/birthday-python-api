@@ -25,23 +25,20 @@ psycopg2-binary: 2.9.11
 Kubernetes: 1.37.0 (via Minikube)
 Helm: 4.x
 ArgoCD: 3.2.0
-Podman Desktop: 1.23
+Docker Desktop: 4.53.0
 Docker Hub: alopezt24/birthday-api
 ```
 
 ## Prerequisites
 ```bash
 # Install tools
-brew install minikube podman helm
+brew install minikube docker helm
 
 # Start Minikube
-minikube start --driver=podman --cpus=2 --memory=4096 \
-  --container-runtime=cri-o \
-  --extra-config=kubelet.allowed-unsafe-sysctls='kernel.msg*,net.ipv4.route.min_pmtu'
+minikube start --driver=docker --cpus=2 --memory=2048
 
 # Enable ingress
 minikube addons enable ingress
-minikube addons enable storage-provisioner
 ```
 
 ## Quick Start
@@ -64,11 +61,11 @@ ArgoCD UI: https://localhost:8080 (admin / password-from-above)
 ### 2. Build and Push Image
 ```bash
 # Login to Docker Hub
-podman login docker.io
+docker login docker.io
 
 # Build and push
-chmod +x podman-build.sh
-./podman-build.sh
+chmod +x docker-build.sh
+./docker-build.sh
 ```
 
 ### 3. Deploy with ArgoCD
@@ -77,10 +74,6 @@ chmod +x podman-build.sh
 # Deploy
 kubectl apply -f argocd/postgres-app.yaml
 kubectl apply -f argocd/birthday-api-app.yaml
-
-# Wait for sync
-kubectl wait --for=condition=Synced application/postgres -n argocd --timeout=120s
-kubectl wait --for=condition=Synced application/birthday-api -n argocd --timeout=120s
 ```
 
 ### 4. Configure DNS
@@ -120,7 +113,7 @@ kubectl get applications -n argocd
 vim app/main.py
 
 # 2. Build and push
-./podman-build.sh
+./docker-build.sh
 
 # 3. Commit and push
 git add .
@@ -168,6 +161,6 @@ birthday-api/
 │   └── postgres/          # Database Helm chart
 ├── argocd/                # ArgoCD applications
 ├── Dockerfile
-├── podman-build.sh
+├── docker-build.sh
 └── README.md
 ```
