@@ -10,7 +10,7 @@ spec:
   
   # Source configuration - where the Helm chart is
   source:
-    repoURL: https://github.com/alopezt24/birthday-api
+    repoURL: https://github.com/alopezt24/birthday-python-api.git
     targetRevision: HEAD
     path: charts/postgres
     helm:
