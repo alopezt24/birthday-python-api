@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "birthday-api.fullname" . }}-config
+  labels:
+    {{- include "birthday-api.labels" . | nindent 4 }}
+data:
+  {{- range .Values.env }}
+  {{ .name }}: {{ .value | quote }}
+  {{- end }}

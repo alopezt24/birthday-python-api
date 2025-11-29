@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgres
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  # Source configuration - where the Helm chart is
+  source:
+    repoURL: https://github.com/alopezt24/birthday-api
+    targetRevision: HEAD
+    path: charts/postgres
+    helm:
+      # Override values if needed
+      valueFiles:
+        - values.yaml
+  
+  # Destination - where to deploy
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: birthday-system
+  
+  # Sync policy - automated deployment
+  syncPolicy:
+    automated:
+      prune: true       # Delete resources when removed from git
+      selfHeal: true    # Auto-sync when cluster state differs
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

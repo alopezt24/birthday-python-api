@@ -1,5 +1,5 @@
 # Multi-stage build for smaller image
-FROM python:3.12-slim as builder
+FROM python:3.13.1-slim as builder
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ COPY app/requirements.txt .
 RUN pip install --no-cache-dir --user -r requirements.txt
 
 # Runtime stage
-FROM python:3.12-slim
+FROM python:3.13.1-slim
 
 WORKDIR /app
 

@@ -1,0 +1,32 @@
+# PostgreSQL configuration
+image:
+  repository: postgres
+  tag: "18.1-alpine"
+  pullPolicy: IfNotPresent
+
+# Database credentials
+auth:
+  database: birthdays
+  username: postgres
+  password: postgres
+
+# Resource limits
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+# Persistent storage
+persistence:
+  enabled: true
+  storageClass: "standard"
+  size: 1Gi
+  accessMode: ReadWriteOnce
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 5432
