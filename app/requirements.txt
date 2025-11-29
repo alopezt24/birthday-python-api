@@ -1,0 +1,11 @@
+# FastAPI framework
+fastapi==0.122.0
+
+# ASGI server for production
+uvicorn[standard]==0.34.0
+
+# PostgreSQL adapter for Python
+psycopg2-binary==2.9.10
+
+# SQL toolkit and ORM
+sqlalchemy==2.0.36
