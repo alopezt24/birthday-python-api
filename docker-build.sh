@@ -15,9 +15,6 @@ docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
 echo "Tagging image for Docker Hub..."
 docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${REGISTRY}/${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
 
-echo "Login to Docker Hub (enter your credentials)..."
-docker login docker.io
-
 echo "Pushing to Docker Hub..."
 docker push ${REGISTRY}/${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
 

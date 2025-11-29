@@ -29,7 +29,7 @@ Docker Desktop: 4.53.0
 Docker Hub: alopezt24/birthday-api
 ```
 
-## Prerequisites
+## Prerequisites macOS
 ```bash
 # Install tools
 brew install minikube docker helm
@@ -90,7 +90,7 @@ echo "127.0.0.1 birthday-api.local" | sudo tee -a /etc/hosts
 ## Testing
 ```bash
 # Create user
-curl -X PUT http://birthday-api.local/hello/andres \
+curl -v -X PUT http://birthday-api.local/hello/andres \
   -H "Content-Type: application/json" \
   -d '{"dateOfBirth": "2000-01-15"}'
 
@@ -158,8 +158,12 @@ kubectl describe ingress -n birthday-system
 ### Database connection issues
 ```bash
 # Test database
-kubectl run -it --rm debug --image=postgres:18.1-alpine --restart=Never -n birthday-system -- \
-  psql postgresql://postgres:postgres@postgres.birthday-system.svc.cluster.local:5432/birthdays -c "SELECT 1;"
+kubectl run -it --rm debug \
+  --image=postgres:18.1-alpine \
+  --restart=Never \
+  -n birthday-system -- \
+  psql "postgresql://postgres:postgres@postgres.birthday-system.svc.cluster.local:5432/birthdays" \
+  -c "SELECT username, date_of_birth FROM users ORDER BY username;"
 ```
 
 ## Cleanup
