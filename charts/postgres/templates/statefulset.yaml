@@ -52,6 +52,7 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /var/lib/postgresql/data
+          subPath: pgdata
   {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:

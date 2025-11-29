@@ -22,7 +22,7 @@ resources:
 # Persistent storage
 persistence:
   enabled: true
-  storageClass: ""
+  storageClass: "standard"
   size: 1Gi
   accessMode: ReadWriteOnce
 
