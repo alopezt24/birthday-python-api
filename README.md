@@ -34,7 +34,7 @@ Docker Hub: alopezt24/birthday-api
 # Install tools
 brew install minikube docker helm
 
-# Start Minikube
+# Start Minikube with Docker driver
 minikube start --driver=docker --cpus=2 --memory=2048
 
 # Enable ingress
@@ -70,26 +70,36 @@ chmod +x docker-build.sh
 
 ### 3. Deploy with ArgoCD
 ```bash
-
 # Deploy
 kubectl apply -f argocd/postgres-app.yaml
 kubectl apply -f argocd/birthday-api-app.yaml
 ```
 
-### 4. Configure DNS
+### 4. Enable Network Access (macOS required)
 ```bash
-echo "$(minikube ip) birthday-api.local" | sudo tee -a /etc/hosts
+# Terminal 1: Start Minikube tunnel (leave it running)
+sudo minikube tunnel
+# This will ask for your password and must stay running
+
+# Terminal 2: Configure DNS
+echo "127.0.0.1 birthday-api.local" | sudo tee -a /etc/hosts
 ```
+
+**Important:** The `minikube tunnel` command must remain running in a separate terminal for the ingress to work on macOS.
 
 ## Testing
 ```bash
 # Create user
-curl -X PUT http://birthday-api.local/hello/john \
+curl -X PUT http://birthday-api.local/hello/andres \
   -H "Content-Type: application/json" \
   -d '{"dateOfBirth": "2000-01-15"}'
 
+# Expected: 204 No Content
+
 # Get message
-curl http://birthday-api.local/hello/john
+curl http://birthday-api.local/hello/andres
+
+# Expected: {"message": "Hello, andres! Your birthday is in X day(s)"}
 ```
 
 ## Monitoring
@@ -105,6 +115,9 @@ kubectl get all -n birthday-system
 
 # ArgoCD status
 kubectl get applications -n argocd
+
+# Check ingress
+kubectl get ingress -n birthday-system
 ```
 
 ## Making Changes
@@ -124,29 +137,44 @@ git push
 ```
 
 ## Troubleshooting
+
+### Ingress not accessible
+```bash
+# Verify minikube tunnel is running
+# In a separate terminal, run:
+sudo minikube tunnel
+
+# Verify /etc/hosts entry
+cat /etc/hosts | grep birthday-api.local
+# Should show: 127.0.0.1 birthday-api.local
+
+# Check ingress controller
+kubectl get pods -n ingress-nginx
+
+# Check ingress status
+kubectl describe ingress -n birthday-system
+```
+
+### Database connection issues
 ```bash
 # Test database
 kubectl run -it --rm debug --image=postgres:18.1-alpine --restart=Never -n birthday-system -- \
   psql postgresql://postgres:postgres@postgres.birthday-system.svc.cluster.local:5432/birthdays -c "SELECT 1;"
-
-# Check ingress
-kubectl describe ingress -n birthday-system
-
-# Force ArgoCD sync
-kubectl patch application birthday-api -n argocd --type merge -p '{"operation":{"sync":{}}}'
-
-# Restart pods
-kubectl rollout restart deployment/birthday-api -n birthday-system
 ```
 
 ## Cleanup
 ```bash
+# Stop minikube tunnel (Ctrl+C in the tunnel terminal)
+
 # Delete applications
 kubectl delete -f argocd/birthday-api-app.yaml
 kubectl delete -f argocd/postgres-app.yaml
 
 # Delete namespace
 kubectl delete namespace birthday-system
+
+# Remove DNS entry
+sudo sed -i '' '/birthday-api.local/d' /etc/hosts
 
 # Stop Minikube
 minikube stop
@@ -156,11 +184,27 @@ minikube stop
 ```
 birthday-api/
 ├── app/                    # Python code
+│   ├── main.py
+│   ├── models.py
+│   ├── db.py
+│   └── requirements.txt
 ├── charts/
 │   ├── birthday-api/      # Application Helm chart
 │   └── postgres/          # Database Helm chart
 ├── argocd/                # ArgoCD applications
+│   ├── birthday-api-app.yaml
+│   └── postgres-app.yaml
 ├── Dockerfile
 ├── docker-build.sh
 └── README.md
 ```
+
+## Important Notes
+
+### macOS Networking
+
+On macOS with Docker Desktop, Minikube runs in a VM. The `minikube tunnel` command creates a network route from your Mac to the Minikube cluster:
+
+- **Required:** `sudo minikube tunnel` must be running in a separate terminal
+- **DNS:** Use `127.0.0.1` in `/etc/hosts`, not the Minikube IP
+- **Password:** Tunnel requires sudo password to create network routes
