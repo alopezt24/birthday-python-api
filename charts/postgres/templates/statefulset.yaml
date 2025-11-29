@@ -27,7 +27,7 @@ spec:
         - name: POSTGRES_PASSWORD
           value: {{ .Values.auth.password | quote }}
         - name: PGDATA
-          value: /var/lib/postgresql/data/pgdata
+          value: /var/lib/postgresql/pgdata
         ports:
         - name: postgresql
           containerPort: 5432
@@ -51,8 +51,7 @@ spec:
           periodSeconds: 5
         volumeMounts:
         - name: data
-          mountPath: /var/lib/postgresql/data
-          subPath: pgdata
+          mountPath: /var/lib/postgresql
   {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
