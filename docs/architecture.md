@@ -23,7 +23,6 @@ High-availability production deployment on AWS with GitOps automation, service m
 | **DNS** | Route 53 | Domain routing + health checks |
 | **Security** | WAF | DDoS protection + rate limiting |
 | **Logging** | CloudWatch | Centralized logs and metrics |
-| **Monitoring** | Prometheus + Grafana | Advanced metrics and dashboards (optional enhancement) |
 
 ---
 
@@ -79,10 +78,6 @@ All infrastructure is defined and deployed using Terraform:
 
 Istio provides advanced traffic management and security for pod-to-pod communication.
 
-**Components**:
-- **Control Plane**: Istiod (Pilot, Citadel, Galley)
-- **Data Plane**: Envoy proxy sidecar in each pod
-
 **Capabilities**:
 - **mTLS**: Automatic mutual TLS between all services
 - **Traffic Management**: Canary deployments, A/B testing, circuit breakers
@@ -106,7 +101,7 @@ All traffic flows through Envoy, enabling transparent security and observability
 
 ## Component Relationships
 
-### Infrastructure Deployment Flow
+### Infrastructure Deployment
 
 ```
 Developer
@@ -122,33 +117,7 @@ Terraform
 AWS Resources (provisioned)
 ```
 
-### User Traffic Flow
-
-```
-End User
-  ↓ HTTPS
-Route 53 (DNS)
-  ↓
-WAF (Security filtering)
-  ↓
-Internet Gateway
-  ↓
-Application Load Balancer (Multi-AZ)
-  ↓
-Istio Ingress Gateway
-  ↓
-Kubernetes Service
-  ↓
-Envoy Sidecar (mTLS)
-  ↓
-API Pod (FastAPI)
-  ↓
-RDS PostgreSQL (Primary)
-  ⇄ Sync Replication ⇄ RDS Standby
-  ⇄ Async Replication ⇄ RDS Read Replica
-```
-
-### GitOps Deployment Flow
+### GitOps Deployment
 
 ```
 Developer
@@ -174,6 +143,31 @@ EKS Worker Nodes
 API Pods (updated)
 ```
 
+### User Traffic
+
+```
+End User
+  ↓ HTTPS
+Route 53 (DNS)
+  ↓
+WAF (Security filtering)
+  ↓
+Internet Gateway
+  ↓
+Application Load Balancer (Multi-AZ)
+  ↓
+Istio Ingress Gateway
+  ↓
+Kubernetes Service
+  ↓
+Envoy Sidecar (mTLS)
+  ↓
+API Pod (FastAPI)
+  ↓
+RDS PostgreSQL (Primary)
+  ⇄ Sync Replication ⇄ RDS Standby
+  ⇄ Async Replication ⇄ RDS Read Replica
+```
 ---
 
 ## High Availability Strategy
@@ -185,7 +179,7 @@ API Pods (updated)
 - ALB spans all 3 AZs with health checks
 
 **Auto-scaling**:
-- Horizontal Pod Autoscaler: 6-50 pods based on CPU/memory
+- Horizontal Pod Autoscaler: 2-4 pods based on CPU/memory
 - Cluster Autoscaler: adds/removes nodes based on demand
 - RDS: vertical scaling via instance class changes
 
@@ -210,11 +204,11 @@ API Pods (updated)
 - Pod Security Standards: restricted mode
 
 **Data Security**:
-- Secrets Manager: encrypted credentials with auto-rotation
-- TLS 1.2+ for all external traffic (ACM certificate)
+- Secrets Manager: encrypted credentials
+- TLS 1.2+ for all external traffic (ACM certificates)
 
 **Access Control**:
-- IAM roles for service accounts (IRSA)
+- IAM roles for service accounts.
 - Least privilege policies
 - No pods run as root
 
@@ -226,7 +220,6 @@ API Pods (updated)
 - Application logs from all pods
 - EKS control plane logs
 - RDS database logs
-- Retention: 90 days
 
 **Metrics** (CloudWatch):
 - Pod CPU/memory utilization
@@ -234,7 +227,7 @@ API Pods (updated)
 - RDS performance metrics
 - ALB request/error rates
 
-**Enhanced Monitoring** (Prometheus + Grafana - Optional)
+**Enhanced Monitoring** (Prometheus + Grafana - Optional, more advanced)
 
 ---
 
@@ -262,3 +255,6 @@ API Pods (updated)
    - Push Helm charts to Git repository
    - ArgoCD automatically syncs and deploys
    - Verify pods running with Istio sidecars
+
+5. **Application**
+   - Test your application.
