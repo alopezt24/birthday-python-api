@@ -34,6 +34,9 @@ Docker Hub: alopezt24/birthday-api
 # Install tools
 brew install minikube docker helm
 
+# Manual Docker-desktop installation
+https://docs.docker.com/desktop/setup/install/mac-install/
+
 # Start Minikube with Docker driver
 minikube start --driver=docker --cpus=2 --memory=2048
 
