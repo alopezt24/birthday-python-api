@@ -1,12 +1,12 @@
 {{/*
-Expand the name of the chart.
+Chart name
 */}}
 {{- define "birthday-api.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Create a default fully qualified app name.
+Fullname
 */}}
 {{- define "birthday-api.fullname" -}}
 {{- if .Values.fullnameOverride }}
@@ -22,22 +22,14 @@ Create a default fully qualified app name.
 {{- end }}
 
 {{/*
-Create chart name and version as used by the chart label.
-*/}}
-{{- define "birthday-api.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
-{{/*
 Common labels
 */}}
 {{- define "birthday-api.labels" -}}
-helm.sh/chart: {{ include "birthday-api.chart" . }}
-{{ include "birthday-api.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
+app.kubernetes.io/name: {{ include "birthday-api.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version }}
 {{- end }}
 
 {{/*
@@ -46,4 +38,11 @@ Selector labels
 {{- define "birthday-api.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "birthday-api.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Database URL
+*/}}
+{{- define "birthday-api.databaseUrl" -}}
+postgresql://{{ .Values.database.username }}:{{ .Values.database.password }}@{{ .Values.database.host }}:{{ .Values.database.port }}/{{ .Values.database.name }}
 {{- end }}
