@@ -4,6 +4,20 @@ image:
   tag: "18.1-alpine"
   pullPolicy: IfNotPresent
 
+# Pod security context for PostgreSQL
+podSecurityContext:
+  fsGroup: 999  # postgres group
+  fsGroupChangePolicy: "OnRootMismatch"
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 999  # UID postgres
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false  # PostgreSQL logs and data
+
 # Database credentials
 auth:
   database: birthdays

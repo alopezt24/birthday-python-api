@@ -5,7 +5,7 @@
 set -e
 
 IMAGE_NAME="birthday-api"
-IMAGE_TAG="1.0.0"
+IMAGE_TAG="1.0.1"
 DOCKERHUB_USER="alopezt24"
 REGISTRY="docker.io"
 

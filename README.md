@@ -187,17 +187,20 @@ minikube stop
 ## Project Structure
 ```
 birthday-api/
-├── app/                    # Python code
+├── app/                        # Python code
 │   ├── main.py
 │   ├── models.py
 │   ├── db.py
 │   └── requirements.txt
-├── charts/
-│   ├── birthday-api/      # Application Helm chart
-│   └── postgres/          # Database Helm chart
-├── argocd/                # ArgoCD applications
+├── argocd/                    # ArgoCD applications
 │   ├── birthday-api-app.yaml
 │   └── postgres-app.yaml
+├── charts/
+│   ├── birthday-api/          # Application Helm chart
+│   └── postgres/              # Database Helm chart
+├── docs/                      # Architecture document and diagram
+│   ├── architecture.md
+│   └── Birthday API Architecture AWS.png
 ├── Dockerfile
 ├── docker-build.sh
 └── README.md

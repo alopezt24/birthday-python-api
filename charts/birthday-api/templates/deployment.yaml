@@ -19,9 +19,21 @@ spec:
       labels:
         {{- include "birthday-api.selectorLabels" . | nindent 8 }}
     spec:
+      # Pod-level security context
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      
       initContainers:
       - name: wait-for-db
         image: busybox:1.37
+        # Security context for init container
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 65534
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
         command:
         - sh
         - -c
@@ -31,21 +43,32 @@ spec:
             sleep 2
           done
           echo "Database is ready!"
+      
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
+        
+        # Container-level security context
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        
         ports:
         - name: http
           containerPort: 8000
+          protocol: TCP
+        
         envFrom:
         - configMapRef:
             name: {{ include "birthday-api.fullname" . }}-config
         - secretRef:
             name: {{ include "birthday-api.fullname" . }}-secret
+        
         livenessProbe:
           {{- toYaml .Values.livenessProbe | nindent 10 }}
+        
         readinessProbe:
           {{- toYaml .Values.readinessProbe | nindent 10 }}
+        
         resources:
           {{- toYaml .Values.resources | nindent 10 }}

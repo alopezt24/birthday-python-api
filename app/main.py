@@ -53,7 +53,7 @@ def save_user(username: str, user_data: UserRequest, db: Session = Depends(get_d
         db.add(new_user)
     
     db.commit()
-    return None
+    return None # 204 No Content
 
 @app.get("/hello/{username}")
 def get_birthday_message(username: str, db: Session = Depends(get_db)):

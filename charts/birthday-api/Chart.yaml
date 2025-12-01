@@ -1,6 +1,6 @@
 apiVersion: v2
 name: birthday-api
-description: FastAPI application to manage user birthdays
+description: A Helm chart for Birthday API
+type: application
 version: 1.0.0
 appVersion: "1.0.0"
-type: application
